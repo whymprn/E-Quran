@@ -1,6 +1,6 @@
 # my_quran
 
-A new Flutter project.
+Aplikasi Penuntun ke Surga
 
 ## Getting Started
 
