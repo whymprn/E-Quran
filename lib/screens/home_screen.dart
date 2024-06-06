@@ -12,7 +12,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: background,
-      appBar: _appBar(),
+      appBar: _appBar(context: context),
       body: DefaultTabController(
         length: 2,
         child: Padding(
@@ -148,16 +148,14 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  AppBar _appBar() => AppBar(
+  AppBar _appBar({required BuildContext context}) => AppBar(
         backgroundColor: background,
         automaticallyImplyLeading: false,
         elevation: 0,
         title: Row(children: [
-          Text(
-            'Quran App',
-            style:
-                GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
+          IconButton(
+              onPressed: (() => Navigator.of(context).pop()),
+              icon: SvgPicture.asset('assets/svgs/back-icon.svg')),
           const Spacer(),
           IconButton(
               onPressed: (() => {}),

@@ -4,17 +4,38 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:my_quran/globals.dart';
 import 'package:my_quran/models/ayat.dart';
 import 'package:my_quran/models/doa.dart';
 import 'package:my_quran/models/surah.dart';
 
-class SurahScreen extends StatelessWidget {
+class SurahScreen extends StatefulWidget {
   final int noSurat;
   const SurahScreen({super.key, required this.noSurat});
 
+  @override
+  _SurahScreenState createState() => _SurahScreenState();
+}
+
+class _SurahScreenState extends State<SurahScreen> {
+  late AudioPlayer _audioPlayer;
+  bool isPlaying = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _audioPlayer = AudioPlayer();
+  }
+
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    super.dispose();
+  }
+
   Future<Surah> _getDetailSurah() async {
-    var data = await Dio().get("https://equran.id/api/surat/$noSurat");
+    var data = await Dio().get("https://equran.id/api/surat/${widget.noSurat}");
     return Surah.fromJson(json.decode(data.toString()));
   }
 
@@ -44,8 +65,8 @@ class SurahScreen extends StatelessWidget {
                 child: ListView.separated(
                   itemBuilder: (context, index) => _ayatItem(
                       ayat: surah.ayat!
-                          .elementAt(index + (noSurat == 1 ? 1 : 0))),
-                  itemCount: surah.jumlahAyat + (noSurat == 1 ? -1 : 0),
+                          .elementAt(index + (widget.noSurat == 1 ? 1 : 0))),
+                  itemCount: surah.jumlahAyat + (widget.noSurat == 1 ? -1 : 0),
                   separatorBuilder: (context, index) => Container(),
                 ),
               ),
@@ -82,16 +103,8 @@ class SurahScreen extends StatelessWidget {
                   const SizedBox(
                     width: 16,
                   ),
-                  const Icon(
-                    Icons.play_arrow_outlined,
-                    color: Colors.white,
-                  ),
                   const SizedBox(
                     width: 16,
-                  ),
-                  const Icon(
-                    Icons.bookmark_outline,
-                    color: Colors.white,
                   ),
                 ],
               ),
@@ -104,7 +117,8 @@ class SurahScreen extends StatelessWidget {
               style: GoogleFonts.amiri(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
-                  fontSize: 18),
+                  fontSize: 25,
+                  height: 2),
               textAlign: TextAlign.right,
             ),
             const SizedBox(
@@ -113,109 +127,143 @@ class SurahScreen extends StatelessWidget {
             Text(
               ayat.idn,
               style: GoogleFonts.poppins(color: text, fontSize: 16),
-            )
+            ),
           ],
         ),
       );
 
   Widget _details({required Surah surah}) => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Stack(children: [
-          Container(
-            height: 257,
-            decoration: BoxDecoration(
+        child: Stack(
+          children: [
+            Container(
+              height: 320,
+              decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    stops: [
-                      0,
-                      .6,
-                      1
-                    ],
-                    colors: [
-                      Color(0xFFDF98FA),
-                      Color(0xFFB070FD),
-                      Color(0xFF9055FF)
-                    ])),
-          ),
-          Positioned(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  stops: [0, .6, 1],
+                  colors: [
+                    Color(0xFFDF98FA),
+                    Color(0xFFB070FD),
+                    Color(0xFF9055FF)
+                  ],
+                ),
+              ),
+            ),
+            Positioned(
               bottom: 0,
               right: 0,
               child: Opacity(
-                  opacity: .2,
-                  child: SvgPicture.asset(
-                    'assets/svgs/quran.svg',
-                    width: 324 - 55,
-                  ))),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(28),
-            child: Column(
-              children: [
-                Text(
-                  surah.namaLatin,
-                  style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 26),
+                opacity: .2,
+                child: SvgPicture.asset(
+                  'assets/svgs/quran.svg',
+                  width: 324 - 55,
                 ),
-                const SizedBox(
-                  height: 4,
-                ),
-                Text(
-                  surah.arti,
-                  style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 16),
-                ),
-                Divider(
-                  color: Colors.white.withOpacity(.35),
-                  thickness: 2,
-                  height: 32,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      surah.tempatTurun.name,
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Container(
-                      width: 4,
-                      height: 4,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(2),
-                          color: Colors.white),
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Text(
-                      "${surah.jumlahAyat} Ayat",
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 32,
-                ),
-                SvgPicture.asset('assets/svgs/bismillah.svg')
-              ],
+              ),
             ),
-          )
-        ]),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(28),
+              child: Column(
+                children: [
+                  Text(
+                    surah.namaLatin,
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 26,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    surah.arti,
+                    style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16),
+                  ),
+                  Divider(
+                    color: Colors.white.withOpacity(.35),
+                    thickness: 2,
+                    height: 32,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        surah.tempatTurun.name,
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(width: 5),
+                      Container(
+                        width: 4,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(2),
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        "${surah.jumlahAyat} Ayat",
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 32),
+                  SvgPicture.asset('assets/svgs/bismillah.svg'),
+                  const SizedBox(height: 25),
+                  ElevatedButton(
+                    onPressed: () {
+                      _toggleAudio(surah.audio);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: const Color.fromARGB(255, 163, 4, 236),
+                      backgroundColor: Colors.white,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          isPlaying ? Icons.pause : Icons.play_arrow_outlined,
+                          color: Colors.black,
+                        ),
+                        const SizedBox(width: 2),
+                        Text(
+                          isPlaying ? "Pause Audio" : "Putar Audio",
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
       );
+
+  void _toggleAudio(String url) async {
+    if (isPlaying) {
+      await _audioPlayer.pause();
+    } else {
+      await _audioPlayer.play(UrlSource(url));
+    }
+    setState(() {
+      isPlaying = !isPlaying;
+    });
+  }
 
   AppBar _appBar({required BuildContext context, required Surah surah}) =>
       AppBar(
@@ -229,15 +277,6 @@ class SurahScreen extends StatelessWidget {
           const SizedBox(
             width: 24,
           ),
-          Text(
-            surah.namaLatin,
-            style:
-                GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          const Spacer(),
-          IconButton(
-              onPressed: (() => {}),
-              icon: SvgPicture.asset('assets/svgs/search-icon.svg')),
         ]),
       );
 }
@@ -278,7 +317,6 @@ class DoaScreen extends StatelessWidget {
               body: Padding(
                 padding: const EdgeInsets.all(20),
                 child: ListView(
-                  // crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const SizedBox(
                       height: 20,
@@ -385,10 +423,6 @@ class DoaScreen extends StatelessWidget {
           const SizedBox(
             width: 24,
           ),
-          const Spacer(),
-          IconButton(
-              onPressed: (() => {}),
-              icon: SvgPicture.asset('assets/svgs/search-icon.svg')),
         ]),
       );
 }
