@@ -37,8 +37,7 @@ class HomeScreen extends StatelessWidget {
                       ),
                     )
                   ],
-              body: const TabBarView(
-                  children: [SurahTab(), DoaTab()])),
+              body: const TabBarView(children: [SurahTab(), DoaTab()])),
         ),
       ),
     );
