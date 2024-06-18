@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:my_quran/globals.dart';
 import 'package:my_quran/tabs/doa_tab.dart';
 import 'package:my_quran/tabs/surah_tab.dart';
+import 'package:my_quran/tabs/surahfull_tab.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -14,9 +15,9 @@ class HomeScreen extends StatelessWidget {
       backgroundColor: background,
       appBar: _appBar(context: context),
       body: DefaultTabController(
-        length: 2,
+        length: 3,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: NestedScrollView(
               headerSliverBuilder: (context, innerBoxIsScrolled) => [
                     SliverToBoxAdapter(
@@ -37,7 +38,8 @@ class HomeScreen extends StatelessWidget {
                       ),
                     )
                   ],
-              body: const TabBarView(children: [SurahTab(), DoaTab()])),
+              body: const TabBarView(
+                  children: [SurahTab(), SurahFullTab(), DoaTab()])),
         ),
       ),
     );
@@ -50,7 +52,8 @@ class HomeScreen extends StatelessWidget {
         indicatorColor: primary,
         indicatorWeight: 3,
         tabs: [
-          _tabItem(label: "Surah"),
+          _tabItem(label: "Terjemahan"),
+          _tabItem(label: "SurahFull"),
           _tabItem(label: "Doa"),
         ]);
   }
@@ -59,7 +62,7 @@ class HomeScreen extends StatelessWidget {
     return Tab(
       child: Text(
         label,
-        style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600),
+        style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600),
       ),
     );
   }
